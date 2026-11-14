@@ -16,3 +16,9 @@ node_modules/
 __pycache__/
 .venv/
 venv/
+data/
+*.db
+*.db-wal
+*.db-shm
+*.log
+.playwright/

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="toolbar">
+  <form class="inline" method="post" action="{{ url_for('jobs_run_all') }}">
+    <input type="hidden" name="mode" value="full">
+    <button type="submit">全量采集（全部平台）</button>
+  </form>
+  <form class="inline" method="post" action="{{ url_for('jobs_run') }}">
+    <input type="hidden" name="mode" value="incremental">
+    <select name="platform">
+      <option value="">全部平台</option>
+      {% for p in platforms %}
+      <option value="{{ p.code }}">{{ p.code }} {{ p.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="secondary">增量采集</button>
+  </form>
+  <form class="inline" method="post" action="{{ url_for('jobs_stop') }}">
+    <button type="submit" class="danger">请求停止（断点保留，可续跑）</button>
+  </form>
+</div>
+
+<h3 class="section-title">任务与断点（水位/断点全部落库，杀进程后自动续跑）</h3>
+<table>
+<tr><th>任务</th><th>平台</th><th>模式</th><th>状态</th><th>列表页</th>
+<th>详情进度</th><th>断点游标</th><th>心跳</th><th>开始/结束</th></tr>
+{% for j in jobs %}
+<tr>
+  <td>{{ j.job_id }}</td><td><code>{{ j.platform_code }}</code></td>
+  <td>{{ j.mode }}</td>
+  <td><span class="tag {{ 'ok' if j.status=='done' else ('crit' if j.status=='failed' else 'warn') }}">{{ j.status }}</span></td>
+  <td>{{ j.list_page }}{{ '✓' if j.list_done else '' }}</td>
+  <td>{{ j.detail_done }}/{{ j.detail_total if j.detail_total is not none else '-' }}</td>
+  <td class="muted">{{ j.detail_cursor or '-' }}</td>
+  <td class="muted">{{ (j.heartbeat_at or '')[11:19] }}</td>
+  <td class="muted">{{ j.started_at[11:19] }} / {{ (j.finished_at or '')[11:19] }}</td>
+</tr>
+{% else %}
+<tr><td colspan="9" class="muted">暂无任务</td></tr>
+{% endfor %}
+</table>
+
+<h3 class="section-title">运行日志（最近 100 条）</h3>
+<div class="log">
+{% for l in logs %}
+<div class="{{ 'err' if l.level=='error' else ('warn' if l.level=='warning' else '') }}">
+[{{ l.created_at[11:19] }}] {{ l.platform_code }} {{ l.level }}: {{ l.message }}</div>
+{% else %}
+<div class="muted">暂无日志</div>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+[
+  {
+    "code": "P01",
+    "name": "华北省医保药品挂网平台",
+    "base_url": "http://127.0.0.1:8101",
+    "mode": "html_login",
+    "auth": {"type": "form", "username": "admin", "password": "hbpass123", "login_path": "/login"},
+    "list_path": "/list",
+    "detail_path": "/detail",
+    "page_size": 10,
+    "rate_window_s": 2,
+    "rate_max": 8,
+    "seed": 101
+  },
+  {
+    "code": "P02",
+    "name": "华东省医药采购服务平台",
+    "base_url": "http://127.0.0.1:8102",
+    "mode": "api_open",
+    "auth": null,
+    "api_list_path": "/api/list",
+    "api_detail_path": "/api/detail",
+    "page_size": 10,
+    "rate_window_s": 2,
+    "rate_max": 5,
+    "seed": 202
+  },
+  {
+    "code": "P03",
+    "name": "华南省药品交易平台",
+    "base_url": "http://127.0.0.1:8103",
+    "mode": "mixed_login",
+    "auth": {"type": "api", "username": "admin", "password": "hnpass456", "login_path": "/api/login"},
+    "api_list_path": "/api/items",
+    "detail_path": "/item",
+    "page_size": 10,
+    "rate_window_s": 2,
+    "rate_max": 7,
+    "seed": 303
+  },
+  {
+    "code": "P04",
+    "name": "华西省集采价格监测平台",
+    "base_url": "http://127.0.0.1:8104",
+    "mode": "html_open",
+    "auth": null,
+    "list_path": "/drugs",
+    "detail_path": "/drug",
+    "page_size": 10,
+    "rate_window_s": 2,
+    "rate_max": 10,
+    "seed": 404
+  }
+]

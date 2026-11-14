@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="toolbar">
+  <a class="btn secondary" href="{{ url_for('changes_page') }}">全部平台</a>
+  {% for p in platforms %}
+  <a class="btn secondary"
+     href="{{ url_for('changes_page', platform=p.code) }}">{{ p.code }}</a>
+  {% endfor %}
+</div>
+<table>
+<tr><th>ID</th><th>平台</th><th>条目编码</th><th>类型</th><th>原价</th>
+<th>新价</th><th>调价额</th><th>幅度</th><th>平台变更时间</th><th>检测时间</th></tr>
+{% for c in changes %}
+<tr>
+  <td>{{ c.id }}</td><td><code>{{ c.platform_code }}</code></td>
+  <td>{{ c.item_code }}</td>
+  <td>
+    {% if c.change_type == 'price' %}<span class="tag warn">调价</span>
+    {% elif c.change_type == 'delist' %}<span class="tag crit">撤网</span>
+    {% else %}<span class="tag ok">恢复挂网</span>{% endif %}
+    {% if c.drug_generic %}<div class="muted">{{ c.drug_generic }}</div>{% endif %}
+  </td>
+  <td>{{ c.old_price if c.old_price is not none else '-' }}</td>
+  <td>{{ c.new_price if c.new_price is not none else '-' }}</td>
+  <td>
+    {% if c.change_type == 'price' %}
+      {{ '%+.2f'|format(c.new_price - c.old_price) }}
+    {% else %}-{% endif %}
+  </td>
+  <td>
+    {% if c.change_type == 'price' %}
+      {{ '%+.1f%%'|format((c.new_price - c.old_price) / c.old_price * 100) }}
+    {% else %}-{% endif %}
+  </td>
+  <td class="muted">{{ (c.source_changed_at or '')[5:16].replace('T', ' ') }}</td>
+  <td class="muted">{{ c.detected_at[11:19] }}</td>
+</tr>
+{% else %}
+<tr><td colspan="10" class="muted">暂无变更记录</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

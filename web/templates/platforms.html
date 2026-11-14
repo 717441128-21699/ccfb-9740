@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="toolbar">
+  <form method="post" action="{{ url_for('sync_config') }}">
+    <button type="submit" class="secondary">从 configs/platforms.json 重新同步</button>
+  </form>
+  <span class="muted">平台地址、认证、限流参数均来自本地配置文件，不指向任何真实网站</span>
+</div>
+<table>
+<tr><th>编码</th><th>平台名称</th><th>地址</th><th>模式</th><th>认证</th>
+<th>限流(次/秒窗)</th><th>启用</th><th>操作</th></tr>
+{% for p in platforms %}
+<tr>
+  <td><code>{{ p.code }}</code></td>
+  <td>{{ p.name }}</td>
+  <td class="muted">{{ p.base_url }}</td>
+  <td>{{ p.mode }}</td>
+  <td>{{ '需要登录' if p.config.auth else '免登录' }}</td>
+  <td>{{ p.config.rate_max }}/{{ p.config.rate_window_s }}s</td>
+  <td>
+    <span class="tag {{ 'ok' if p.enabled else 'gray' }}">
+      {{ '启用' if p.enabled else '停用' }}</span>
+  </td>
+  <td>
+    <form class="inline" method="post"
+          action="{{ url_for('toggle_platform', code=p.code) }}">
+      <input type="hidden" name="enabled" value="{{ 0 if p.enabled else 1 }}">
+      <button class="secondary" type="submit">
+        {{ '停用' if p.enabled else '启用' }}</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

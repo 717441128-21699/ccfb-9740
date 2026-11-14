@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if pending %}
+<h3 class="section-title">待人工确认（规格无法可靠归一，系统未自动建品种）</h3>
+{% for m in pending %}
+<div class="pending-box">
+  <div><b>{{ m.item_code }}</b>（{{ m.platform_code }}）
+    置信度 {{ '%.2f'|format(m.confidence) }} — {{ m.reason }}</div>
+  <div class="muted" style="margin:6px 0">
+    原始：{{ m.generic_name }} / {{ m.dosage_form }} /
+    {{ m.spec_text }} / {{ m.manufacturer }}</div>
+  <form method="post"
+        action="{{ url_for('confirm_mapping', mapping_id=m.id) }}">
+    <input name="generic_name" value="{{ m.generic_name }}" size="16">
+    <input name="dosage_form" value="{{ m.dosage_form }}" size="10">
+    <input name="spec_canonical"
+           value="UNRESOLVED::{{ m.spec_text }}" size="26">
+    <input name="manufacturer" value="{{ m.manufacturer }}" size="20">
+    <button type="submit">确认归一</button>
+  </form>
+</div>
+{% endfor %}
+{% endif %}
+
+<h3 class="section-title">归一品种库（通用名+剂型+标准规格+厂家 四要素唯一）</h3>
+<table>
+<tr><th>ID</th><th>通用名</th><th>剂型</th><th>标准规格</th><th>厂家</th>
+<th>来源条目数</th></tr>
+{% for d in drugs %}
+<tr>
+  <td>{{ d.id }}</td><td>{{ d.generic_name }}</td><td>{{ d.dosage_form }}</td>
+  <td><code>{{ d.spec_canonical }}</code></td>
+  <td>{{ d.manufacturer }}</td><td>{{ d.source_count }}</td>
+</tr>
+{% else %}
+<tr><td colspan="6" class="muted">暂无品种，先跑一次全量采集</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="toolbar">
+  <a class="btn secondary" href="{{ url_for('alerts_page') }}">未处理</a>
+  <a class="btn secondary" href="{{ url_for('alerts_page', all=1) }}">全部（含已处理）</a>
+</div>
+<table>
+<tr><th>ID</th><th>平台</th><th>类型</th><th>级别</th><th>内容</th>
+<th>片段</th><th>产生时间</th><th>处理</th></tr>
+{% for a in alerts %}
+<tr>
+  <td>{{ a.id }}</td><td><code>{{ a.platform_code }}</code></td>
+  <td>{{ a.kind }}</td>
+  <td><span class="tag {{ 'crit' if a.severity=='critical' else 'warn' }}">
+    {{ a.severity }}</span></td>
+  <td>{{ a.message }}</td>
+  <td class="muted" style="max-width:260px;word-break:break-all">
+    {{ a.raw_excerpt or '-' }}</td>
+  <td class="muted">{{ a.created_at[5:16].replace('T', ' ') }}</td>
+  <td>
+    {% if a.resolved_at %}
+      <span class="tag gray">已处理 {{ a.resolved_at[11:19] }}</span>
+    {% else %}
+      <form class="inline" method="post"
+            action="{{ url_for('resolve_alert', alert_id=a.id) }}">
+        <button class="secondary" type="submit">标记已处理</button>
+      </form>
+    {% endif %}
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="8" class="muted">没有告警</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

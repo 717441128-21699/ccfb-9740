@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="cards">
+  <div class="card"><div class="num">{{ stats.platforms }}</div><div class="lbl">仿真平台</div></div>
+  <div class="card"><div class="num">{{ stats.raw }}</div><div class="lbl">原始挂网条目</div></div>
+  <div class="card"><div class="num">{{ stats.drugs }}</div><div class="lbl">归一品种</div></div>
+  <div class="card"><div class="num">{{ stats.changes }}</div><div class="lbl">价格/撤网变更</div></div>
+  <div class="card"><div class="num">{{ stats.pending }}</div><div class="lbl">待人工确认</div></div>
+  <div class="card"><div class="num">{{ stats.alerts }}</div><div class="lbl">未处理告警</div></div>
+</div>
+<h3 class="section-title">最近任务</h3>
+<table>
+<tr><th>任务</th><th>平台</th><th>模式</th><th>状态</th><th>列表页</th>
+<th>详情进度</th><th>开始</th><th>结束</th></tr>
+{% for j in stats.jobs %}
+<tr>
+  <td>{{ j.job_id }}</td><td>{{ j.platform_code }}</td><td>{{ j.mode }}</td>
+  <td><span class="tag {{ 'ok' if j.status=='done' else ('crit' if j.status=='failed' else 'warn') }}">{{ j.status }}</span></td>
+  <td>{{ j.list_page }}</td>
+  <td>{{ j.detail_done }}/{{ j.detail_total if j.detail_total is not none else '-' }}</td>
+  <td class="muted">{{ j.started_at[11:19] }}</td>
+  <td class="muted">{{ (j.finished_at or '')[11:19] }}</td>
+</tr>
+{% else %}
+<tr><td colspan="8" class="muted">暂无任务</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
